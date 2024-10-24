@@ -47,7 +47,7 @@ export const PATCH = auth(async (req, { params }) => {
 
   const file = await prisma.file.findUnique({
     where: {
-      id: id,
+      id,
     },
   });
 

@@ -72,6 +72,7 @@ model File {
   url  String
   type String
   size Int
+  path String @default("/")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
