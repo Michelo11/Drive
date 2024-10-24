@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { auth, signIn } from "@/lib/auth";
+import { Github } from "lucide-react";
 import { redirect } from "next/navigation";
-import { FaGithub } from "react-icons/fa";
 
 export default async function Page() {
   const session = await auth();
@@ -23,8 +23,8 @@ export default async function Page() {
         }}
       >
         <Button variant="outline" type="submit">
-          <FaGithub />
-          GitHub
+          <Github />
+          Sign in
         </Button>
       </form>
     </div>

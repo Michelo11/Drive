@@ -56,5 +56,14 @@ export const PATCH = auth(async (req, { params }) => {
 
   fs.writeFileSync(file.url, data.content, "utf-8");
 
+  await prisma.file.update({
+    where: {
+      id,
+    },
+    data: {
+      lastUpdate: new Date(),
+    },
+  });
+
   return NextResponse.json(file);
 });

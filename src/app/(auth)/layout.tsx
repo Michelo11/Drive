@@ -1,3 +1,4 @@
+import UserNav from "@/components/user-nav";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
@@ -10,5 +11,10 @@ export default async function AuthLayout({
 
   if (!session) return redirect("/login");
 
-  return <>{children}</>;
+  return (
+    <div className="p-3 space-y-3">
+      <UserNav />
+      {children}
+    </div>
+  );
 }
