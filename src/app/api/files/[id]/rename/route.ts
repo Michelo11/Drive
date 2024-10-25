@@ -2,31 +2,10 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import { NextResponse } from "next/server";
-
-export const DELETE = auth(async (req, context) => {
-  const { id } = await context.params as { id: string };
-
-  if (!req.auth?.user)
-    return NextResponse.json(
-      {
-        message: "Unauthorized",
-      },
-      {
-        status: 401,
-      }
-    );
-
-  await prisma.file.delete({
-    where: {
-      id: id,
-    },
-  });
-
-  return NextResponse.json({ message: "File deleted" });
-});
+import path from "path";
 
 export const PATCH = auth(async (req, context) => {
-  const { id } = context.params as { id: string };
+  const { id } = await context.params as { id: string };
   const data = await req.json();
 
   if (!req.auth?.user)
@@ -39,9 +18,9 @@ export const PATCH = auth(async (req, context) => {
       }
     );
 
-  if (!data.content)
+  if (!data.newName)
     return NextResponse.json(
-      { message: "No content provided" },
+      { message: "No new name provided" },
       { status: 400 }
     );
 
@@ -54,16 +33,19 @@ export const PATCH = auth(async (req, context) => {
   if (!file)
     return NextResponse.json({ message: "File not found" }, { status: 404 });
 
-  fs.writeFileSync(file.url, data.content, "utf-8");
+  const newPath = path.join(path.dirname(file.url), data.newName);
 
-  await prisma.file.update({
+  fs.renameSync(file.url, newPath);
+
+  const updatedFile = await prisma.file.update({
     where: {
       id,
     },
     data: {
-      lastUpdate: new Date(),
+      name: data.newName,
+      url: newPath,
     },
   });
 
-  return NextResponse.json(file);
+  return NextResponse.json(updatedFile);
 });

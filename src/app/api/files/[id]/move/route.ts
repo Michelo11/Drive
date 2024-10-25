@@ -2,8 +2,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export const POST = auth(async (req, { params }) => {
-  const { id } = params as { id: string };
+export const POST = auth(async (req, context) => {
+  const { id } = await context.params as { id: string };
   const data = await req.json();
 
   if (!req.auth?.user)

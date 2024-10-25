@@ -45,17 +45,7 @@ export function DataTable<TData, TValue>({
 
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = [
-      "Bytes",
-      "KB",
-      "MB",
-      "GB",
-      "TB",
-      "PB",
-      "EB",
-      "ZB",
-      "YB",
-    ];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
 
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
@@ -63,60 +53,56 @@ export function DataTable<TData, TValue>({
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => {
+              return (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
+              );
+            })}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows?.length ? (
+          table.getRowModel().rows.map((row) => (
+            <TableRow
+              key={row.id}
+              data-state={row.getIsSelected() && "selected"}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {cell.column.id === "lastUpdate"
+                    ? `${moment(cell.getValue() as string).format(
+                        "MMM D, YYYY"
+                      )} ${moment(cell.getValue() as string).format("h:mm A")}`
+                    : cell.column.id === "size"
+                    ? "type" in (cell.row.original as any) &&
+                      (cell.row.original as any).type === "folder"
+                      ? ""
+                      : formatBytes(cell.getValue() as number)
+                    : flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
             </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {cell.column.id === "lastUpdate"
-                      ? `${moment(cell.getValue() as string).format(
-                          "MMM D, YYYY"
-                        )} ${moment(cell.getValue() as string).format(
-                          "h:mm A"
-                        )}`
-                      : cell.column.id === "size"
-                      ? formatBytes(cell.getValue() as number)
-                      : flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={columns.length} className="h-24 text-center">
+              No results.
+            </TableCell>
+          </TableRow>
+        )}
+      </TableBody>
+    </Table>
   );
 }

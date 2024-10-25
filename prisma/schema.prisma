@@ -74,7 +74,7 @@ model File {
   size Int
   path String @default("/")
 
-  lastUpdate DateTime @default(now())
+  lastUpdate DateTime @default(now()) @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
