@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
   Table,
   TableBody,
   TableCell,
@@ -16,15 +8,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useState } from "react";
-import moment from "moment";
+import Row from "./row";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export default function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -39,18 +39,6 @@ export function DataTable<TData, TValue>({
       sorting,
     },
   });
-
-  function formatBytes(bytes: number, decimals: number = 2) {
-    if (!+bytes) return "0 Bytes";
-
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-  }
 
   return (
     <Table>
@@ -74,27 +62,7 @@ export function DataTable<TData, TValue>({
       </TableHeader>
       <TableBody>
         {table.getRowModel().rows?.length ? (
-          table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              data-state={row.getIsSelected() && "selected"}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {cell.column.id === "lastUpdate"
-                    ? `${moment(cell.getValue() as string).format(
-                        "MMM D, YYYY"
-                      )} ${moment(cell.getValue() as string).format("h:mm A")}`
-                    : cell.column.id === "size"
-                    ? "type" in (cell.row.original as any) &&
-                      (cell.row.original as any).type === "folder"
-                      ? ""
-                      : formatBytes(cell.getValue() as number)
-                    : flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))
+          table.getRowModel().rows.map((row) => <Row key={row.id} row={row} />)
         ) : (
           <TableRow>
             <TableCell colSpan={columns.length} className="h-24 text-center">

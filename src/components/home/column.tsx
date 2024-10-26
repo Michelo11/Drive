@@ -14,8 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { DataTableColumnHeader } from "./data-table-column-header";
-import { DataSheet } from "./data-sheet";
+import DataTableColumnHeader from "./data-table-column-header";
+import DataSheet from "./data-sheet";
 
 export const columns: ColumnDef<FileType>[] = [
   {
@@ -86,13 +86,15 @@ export const columns: ColumnDef<FileType>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => {
-                router.push(`/api/files/${row.original.id}/download`);
-              }}
-            >
-              Download
-            </DropdownMenuItem>
+            {row.original.type !== "folder" && (
+              <DropdownMenuItem
+                onClick={() => {
+                  router.push(`/api/files/${row.original.id}/download`);
+                }}
+              >
+                Download
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => setOpen(true)}>
               Rename
             </DropdownMenuItem>

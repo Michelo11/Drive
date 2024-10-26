@@ -14,7 +14,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
-export function DataSheet({
+export default function DataSheet({
   title,
   description,
   name,
