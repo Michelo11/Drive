@@ -31,6 +31,7 @@ export const GET = auth(async (req, context) => {
   return new NextResponse(fileBuffer, {
     headers: {
       "Content-Disposition": `attachment; filename="${file.name}"`,
+      "Content-Type": file.type,
     },
   });
 });

@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { toast } from "sonner";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -50,6 +51,10 @@ export default function Page() {
       queryClient.invalidateQueries({
         queryKey: ["files"],
       }),
+
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const createFolder = useMutation({
@@ -61,12 +66,16 @@ export default function Page() {
       queryClient.invalidateQueries({
         queryKey: ["files"],
       }),
+
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const { data: files, isLoading } = useQuery<FileType[]>({
     queryKey: ["files"],
     queryFn: async () => {
-      const res = await axiosClient.get("/api/files/");
+      const res = await axiosClient.get("/api/files");
       return res.data;
     },
   });
@@ -130,7 +139,7 @@ export default function Page() {
         <h2>Welcome back!</h2>
         <p className="muted">Here are your most recent files.</p>
 
-        <div className="flex gap-3">
+        <div className="flex flex-flex-wrap gap-3">
           <Button
             variant="outline"
             onClick={() => {
@@ -155,7 +164,7 @@ export default function Page() {
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button onClick={() => inputRef.current?.click()}>Upload file</Button>
           <Button variant="outline" onClick={() => setOpen("file")}>
             Create file

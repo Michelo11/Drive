@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { TableCell, TableRow } from "../ui/table";
+import { toast } from "sonner";
 
 function formatBytes(bytes: number, decimals: number = 2) {
   if (!+bytes) return "0 Bytes";
@@ -35,6 +36,16 @@ export default function Row({ row }: { row: RowType<any> }) {
             : row.original.path + "/") + row.original.name,
       });
     },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["files"],
+      });
+    },
+
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const [{ opacity }, dragRef] = useDrag(
@@ -53,10 +64,6 @@ export default function Row({ row }: { row: RowType<any> }) {
     drop: async (dropped: any) => {
       setHover(false);
       await moveFile.mutateAsync(dropped.id);
-
-      queryClient.invalidateQueries({
-        queryKey: ["files"],
-      });
     },
     hover: (_, observer) => {
       setHover(observer.isOver({ shallow: true }));
@@ -84,6 +91,8 @@ export default function Row({ row }: { row: RowType<any> }) {
                 : row.original.path + "/") +
               row.original.name
           );
+        } else {
+          router.push("/editor?id=" + row.original.id);
         }
       }}
     >

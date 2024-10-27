@@ -26,7 +26,7 @@ export const DELETE = auth(async (req, context) => {
 });
 
 export const PATCH = auth(async (req, context) => {
-  const { id } = context.params as { id: string };
+  const { id } = await context.params as { id: string };
   const data = await req.json();
 
   if (!req.auth?.user)

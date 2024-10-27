@@ -7,6 +7,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { File, Folder, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
 import {
   DropdownMenu,
@@ -14,8 +15,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import DataTableColumnHeader from "./data-table-column-header";
 import DataSheet from "./data-sheet";
+import DataTableColumnHeader from "./data-table-column-header";
 
 export const columns: ColumnDef<FileType>[] = [
   {
@@ -63,18 +64,26 @@ export const columns: ColumnDef<FileType>[] = [
 
       const deleteFile = useMutation({
         mutationFn: async () => {
-          await axiosClient.delete(`/api/files/${row.original.id}`);
+          return axiosClient.delete(`/api/files/${row.original.id}`);
         },
 
         onSettled: () =>
           queryClient.invalidateQueries({
             queryKey: ["files"],
           }),
+
+        onError: (error) => {
+          toast.error(error.message);
+        },
       });
 
       const renameFile = useMutation({
         mutationFn: ({ id, newName }: { id: string; newName: string }) => {
           return axiosClient.patch(`/api/files/${id}/rename`, { newName });
+        },
+
+        onError: (error) => {
+          toast.error(error.message);
         },
       });
 
