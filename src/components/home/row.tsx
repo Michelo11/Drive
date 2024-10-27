@@ -22,6 +22,7 @@ function formatBytes(bytes: number, decimals: number = 2) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function Row({ row }: { row: RowType<any> }) {
   const router = useRouter();
   const [hover, setHover] = useState<boolean>(false);
@@ -59,9 +60,9 @@ export default function Row({ row }: { row: RowType<any> }) {
     []
   );
 
-  const [_, drop] = useDrop(() => ({
+  const [, drop] = useDrop(() => ({
     accept: "FILE",
-    drop: async (dropped: any) => {
+    drop: async (dropped: { id: string }) => {
       setHover(false);
       await moveFile.mutateAsync(dropped.id);
     },
@@ -81,7 +82,7 @@ export default function Row({ row }: { row: RowType<any> }) {
       data-state={(row.getIsSelected() || hover) && "selected"}
       className={row.original.type === "folder" ? " cursor-pointer" : ""}
       onClick={(e) => {
-        if ((e.target as any).tagName !== "TD") return;
+        if ((e.target as HTMLElement).tagName !== "TD") return;
 
         if (row.original.type === "folder") {
           router.push(
@@ -103,8 +104,8 @@ export default function Row({ row }: { row: RowType<any> }) {
                 "MMM D, YYYY"
               )} ${moment(cell.getValue() as string).format("h:mm A")}`
             : cell.column.id === "size"
-            ? "type" in (cell.row.original as any) &&
-              (cell.row.original as any).type === "folder"
+            ? "type" in (cell.row.original as { type: string }) &&
+              cell.row.original.type === "folder"
               ? ""
               : formatBytes(cell.getValue() as number)
             : flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -12,7 +12,7 @@ import { FileType } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUp } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { toast } from "sonner";
@@ -28,12 +28,6 @@ export default function Page() {
   const [search, setSearch] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState<string | null>("");
-
-  const handleUpload = async (file: File) => {
-    if (!file) return;
-
-    await uploadFile.mutateAsync(file);
-  };
 
   const uploadFile = useMutation({
     mutationFn: (file: File) => {
@@ -56,6 +50,15 @@ export default function Page() {
       toast.error(error.message);
     },
   });
+
+  const handleUpload = useCallback(
+    async (file: File) => {
+      if (!file) return;
+
+      await uploadFile.mutateAsync(file);
+    },
+    [uploadFile]
+  );
 
   const createFolder = useMutation({
     mutationFn: (name: string) => {
@@ -113,13 +116,13 @@ export default function Page() {
       window.removeEventListener("dragover", (e) => e.preventDefault());
       window.removeEventListener("drop", drop);
     };
-  }, []);
+  }, [handleUpload]);
 
   useEffect(() => {
     if (searchParams.get("path") !== currentPath) {
       setCurrentPath(searchParams.get("path") ?? "/");
     }
-  }, [searchParams]);
+  }, [searchParams, currentPath]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -128,7 +131,7 @@ export default function Page() {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [currentPath]);
+  }, [currentPath, searchParams, router]);
 
   return (
     <div className="flex flex-col gap-3">

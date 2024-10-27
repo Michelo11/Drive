@@ -45,7 +45,7 @@ export default function FileComponent({
 
       return () => clearTimeout(timeout);
     }
-  }, [newContent]);
+  }, [newContent, editFile]);
 
   return (
     <div className="flex flex-col gap-3">
